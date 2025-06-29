@@ -271,7 +271,7 @@ def main():
                 ratio = max_price / min_price if min_price > 0 else 0
                 
                 price_variations.append({
-                    'Produto': product_data['descricao_catmat'].iloc[0][:50] + '...',
+                    'Produto': product_data['descricao_catmat'].iloc[0],
                     'Categoria': product_data['categoria_produto'].iloc[0],
                     'Preço Mín': f"R$ {min_price:.2f}",
                     'Preço Máx': f"R$ {max_price:.2f}",
@@ -367,7 +367,7 @@ def main():
                     produto_data, 
                     x='regiao', 
                     y='preco_unitario',
-                    title=f"Distribuição de Preços por Região\n{produto_selecionado[:50]}..."
+                    title=f"Distribuição de Preços por Região\n{produto_selecionado}..."
                 )
                 st.plotly_chart(fig_box, use_container_width=True)
             
@@ -521,7 +521,7 @@ def main():
             with col2:
                 # Top discrepâncias por categoria
                 top_discrepancies = discrepancies.head(20).copy()
-                top_discrepancies['descricao_truncada'] = top_discrepancies['descricao'].str[:30] + '...'
+                top_discrepancies['descricao_truncada'] = top_discrepancies['descricao']
                 
                 fig_top_disc = px.bar(
                     top_discrepancies, 
@@ -566,7 +566,7 @@ def main():
             
             # Formatar dados para exibição
             display_discrepancies = filtered_discrepancies.copy()
-            display_discrepancies['Produto'] = display_discrepancies['descricao'].str[:60] + '...'
+            display_discrepancies['Produto'] = display_discrepancies['descricao']
             display_discrepancies['Categoria'] = display_discrepancies['categoria']
             display_discrepancies['Razão de Preço'] = display_discrepancies['price_ratio'].round(1).astype(str) + 'x'
             display_discrepancies['Preço Mín'] = 'R$ ' + display_discrepancies['min_price'].round(2).astype(str)
@@ -628,7 +628,7 @@ def main():
                             total_savings += potential_savings
                             
                             savings_opportunities.append({
-                                'Produto': row['descricao'][:35] + '...',
+                                'Produto': row['descricao'],
                                 'Região Atual': regiao,
                                 'Preço Atual': f"R$ {stats['preco_unitario']:.2f}",
                                 'Preço Benchmark': f"R$ {benchmark_price:.2f}",
