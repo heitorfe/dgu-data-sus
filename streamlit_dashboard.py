@@ -101,44 +101,55 @@ else:
     df_filtered = df
 
 
-# Additional filters
-selected_regions = st.sidebar.multiselect(
-    "Regiões",
-    options=df_filtered['regiao'].unique(),
-    default=df_filtered['regiao'].unique()
-)
+# Additional filters with collapsible sections
+with st.sidebar.expander("🔍 Filtros Avançados", expanded=False):
+    st.markdown("### Filtros por Região e Categoria")
+    
+    # Enable/disable advanced filters
+    use_advanced_filters = st.checkbox("Habilitar filtros avançados", value=False)
+    
+    if use_advanced_filters:
+        selected_regions = st.multiselect(
+            "Regiões",
+            options=df_filtered['regiao'].unique(),
+            default=df_filtered['regiao'].unique()
+        )
 
-selected_macro_categories = st.sidebar.multiselect(
-    "Macro Categorias",
-    options=df_filtered['macro_categoria'].unique(),
-    default=df_filtered['macro_categoria'].unique()
-)
+        selected_macro_categories = st.multiselect(
+            "Macro Categorias",
+            options=df_filtered['macro_categoria'].unique(),
+            default=df_filtered['macro_categoria'].unique()
+        )
 
-# Filter dataframe based on selected macro categories to get relevant submacro categories
-df_macro_filtered = df_filtered[df_filtered['macro_categoria'].isin(selected_macro_categories)]
+        # Filter dataframe based on selected macro categories to get relevant submacro categories
+        df_macro_filtered = df_filtered[df_filtered['macro_categoria'].isin(selected_macro_categories)]
 
-selected_submacro_categories = st.sidebar.multiselect(
-    "Sub Categorias",
-    options=df_macro_filtered['submacro_categoria'].unique(),
-    default=df_macro_filtered['submacro_categoria'].unique()
-)
+        selected_submacro_categories = st.multiselect(
+            "Sub Categorias",
+            options=df_macro_filtered['submacro_categoria'].unique(),
+            default=df_macro_filtered['submacro_categoria'].unique()
+        )
 
-# Filter again based on selected submacro categories to get relevant categories
-df_submacro_filtered = df_macro_filtered[df_macro_filtered['submacro_categoria'].isin(selected_submacro_categories)]
+        # Filter again based on selected submacro categories to get relevant categories
+        df_submacro_filtered = df_macro_filtered[df_macro_filtered['submacro_categoria'].isin(selected_submacro_categories)]
 
-selected_categories = st.sidebar.multiselect(
-    "Categorias Específicas",
-    options=df_submacro_filtered['categoria'].unique(),
-    default=df_submacro_filtered['categoria'].unique()
-)
+        selected_categories = st.multiselect(
+            "Categorias Específicas",
+            options=df_submacro_filtered['categoria'].unique(),
+            default=df_submacro_filtered['categoria'].unique()
+        )
 
-# Apply all filters
-df_filtered = df_filtered[
-    (df_filtered['regiao'].isin(selected_regions)) &
-    (df_filtered['macro_categoria'].isin(selected_macro_categories)) &
-    (df_filtered['submacro_categoria'].isin(selected_submacro_categories)) &
-    (df_filtered['categoria'].isin(selected_categories))
-]
+        # Apply all filters
+        df_filtered = df_filtered[
+            (df_filtered['regiao'].isin(selected_regions)) &
+            (df_filtered['macro_categoria'].isin(selected_macro_categories)) &
+            (df_filtered['submacro_categoria'].isin(selected_submacro_categories)) &
+            (df_filtered['categoria'].isin(selected_categories))
+        ]
+    else:
+        st.info("Filtros avançados desabilitados - mostrando todos os dados")
+
+
 
 # Main dashboard
 st.title("🏥 Dashboard SUS - Análise de Preços e Compras")
