@@ -148,43 +148,60 @@ with st.sidebar.expander("🔍 Filtros Avançados", expanded=False):
     use_advanced_filters = st.checkbox("Habilitar filtros avançados", value=False)
     
     if use_advanced_filters:
-        selected_regions = st.multiselect(
-            "Regiões",
-            options=df_filtered['regiao'].unique(),
-            default=df_filtered['regiao'].unique()
+        # Region filter with "Todos" option
+        region_options = ["Todos"] + sorted(df_filtered['regiao'].unique().tolist())
+        selected_region = st.selectbox(
+            "Região",
+            options=region_options,
+            index=0
         )
 
-        selected_macro_categories = st.multiselect(
-            "Macro Categorias",
-            options=df_filtered['macro_categoria'].unique(),
-            default=df_filtered['macro_categoria'].unique()
+        # Macro category filter with "Todos" option
+        macro_cat_options = ["Todos"] + sorted(df_filtered['macro_categoria'].unique().tolist())
+        selected_macro_category = st.selectbox(
+            "Macro Categoria",
+            options=macro_cat_options,
+            index=0
         )
 
-        # Filter dataframe based on selected macro categories to get relevant submacro categories
-        df_macro_filtered = df_filtered[df_filtered['macro_categoria'].isin(selected_macro_categories)]
+        # Filter dataframe based on selected macro category to get relevant submacro categories
+        if selected_macro_category == "Todos":
+            df_macro_filtered = df_filtered
+        else:
+            df_macro_filtered = df_filtered[df_filtered['macro_categoria'] == selected_macro_category]
 
-        selected_submacro_categories = st.multiselect(
-            "Sub Categorias",
-            options=df_macro_filtered['submacro_categoria'].unique(),
-            default=df_macro_filtered['submacro_categoria'].unique()
+        submacro_cat_options = ["Todos"] + sorted(df_macro_filtered['submacro_categoria'].unique().tolist())
+        selected_submacro_category = st.selectbox(
+            "Sub Categoria",
+            options=submacro_cat_options,
+            index=0
         )
 
-        # Filter again based on selected submacro categories to get relevant categories
-        df_submacro_filtered = df_macro_filtered[df_macro_filtered['submacro_categoria'].isin(selected_submacro_categories)]
+        # Filter again based on selected submacro category to get relevant categories
+        if selected_submacro_category == "Todos":
+            df_submacro_filtered = df_macro_filtered
+        else:
+            df_submacro_filtered = df_macro_filtered[df_macro_filtered['submacro_categoria'] == selected_submacro_category]
 
-        selected_categories = st.multiselect(
-            "Categorias Específicas",
-            options=df_submacro_filtered['categoria'].unique(),
-            default=df_submacro_filtered['categoria'].unique()
+        category_options = ["Todos"] + sorted(df_submacro_filtered['categoria'].unique().tolist())
+        selected_category = st.selectbox(
+            "Categoria Específica",
+            options=category_options,
+            index=0
         )
 
-        # Apply all filters
-        df_filtered = df_filtered[
-            (df_filtered['regiao'].isin(selected_regions)) &
-            (df_filtered['macro_categoria'].isin(selected_macro_categories)) &
-            (df_filtered['submacro_categoria'].isin(selected_submacro_categories)) &
-            (df_filtered['categoria'].isin(selected_categories))
-        ]
+        # Apply filters only if not "Todos"
+        if selected_region != "Todos":
+            df_filtered = df_filtered[df_filtered['regiao'] == selected_region]
+        
+        if selected_macro_category != "Todos":
+            df_filtered = df_filtered[df_filtered['macro_categoria'] == selected_macro_category]
+        
+        if selected_submacro_category != "Todos":
+            df_filtered = df_filtered[df_filtered['submacro_categoria'] == selected_submacro_category]
+        
+        if selected_category != "Todos":
+            df_filtered = df_filtered[df_filtered['categoria'] == selected_category]
     else:
         st.info("Filtros avançados desabilitados - mostrando todos os dados")
 
@@ -354,11 +371,18 @@ with tab2:
     st.header("Variação de Preços ao Longo do Tempo")
     
     # Select category for analysis
+    category_options = ['Todos'] + list(df_filtered['macro_categoria'].unique())
     selected_cat = st.selectbox(
         "Selecione uma categoria para análise temporal:",
-        options=df_filtered['categoria'].unique(),
+        options=category_options,
         index=0
     )
+    
+    # Filter data based on selection
+    if selected_cat == 'Todos':
+        cat_data = df_filtered
+    else:
+        cat_data = df_filtered[df_filtered['macro_categoria'] == selected_cat]
     
     cat_data = df_filtered[df_filtered['categoria'] == selected_cat]
     
